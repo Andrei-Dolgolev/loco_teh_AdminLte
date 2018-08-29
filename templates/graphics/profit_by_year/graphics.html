@@ -1,0 +1,150 @@
+{% extends 'main/base.html' %}
+
+{% block title %}graphics{% endblock %}
+
+{% block content %}
+    <h1>Graphics</h1>
+    <div style="width: 50%">
+        <div id="cavansWraper">
+            <canvas id="myChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <form class="Select" data-url="."  action="" method="post">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>От</label>
+                            {{ forms.year1 }}
+                        </div>
+                        <div class="form-group">
+                            <label>Серии локомотивов</label>
+                            {{ forms.serias }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>до</label>
+                            {{ forms.year2 }}
+                        </div>
+                        <div class="form-group">
+                            <label>Филиалы</label>
+                            {{ forms.filials }}
+                        </div>
+                    </div>
+                </div>
+              {% csrf_token %}
+              <input type="submit" value="Send e-mail">
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block domready %}
+    var $myForm = $(".Select")
+    var canvas = document.getElementById("myChart")
+    $myForm.submit(function(event){
+        event.preventDefault()
+        var $formData = $(this).serialize()
+        var $thisURL = $myForm.attr('data-url') || window.location.href // or set your own url
+        $.ajax({
+            method: "POST",
+            url: $thisURL,
+            data: $formData,
+            success: handleFormSuccess,
+            error: handleFormError,
+        }).done(function(data) {
+            document.getElementById("cavansWraper").removeChild(document.getElementById("myChart"))
+            var canvas = document.createElement('canvas');
+            canvas.setAttribute("id", "myChart")
+            canvas.setAttribute("width", "800")
+            canvas.setAttribute("height", "400")
+            document.getElementById("cavansWraper").appendChild(canvas)
+            //ctx.clearRect(0, 0, canvas.width, canvas.height)
+            setData(data)
+        });
+    })
+    function handleFormSuccess(data, textStatus, jqXHR){
+        console.log(data)
+        console.log(textStatus)
+        console.log(jqXHR)
+        //$myForm[0].reset(); // reset form data
+    }
+
+    function handleFormError(jqXHR, textStatus, errorThrown){
+        console.log(jqXHR)
+        console.log(textStatus)
+        console.log(errorThrown)
+    }
+    /*
+    var ctx = document.getElementById("myChart").getContext("2d");
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [2001, 2002, 2003, 2004, 2005, 2006],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 0.3
+            }]
+        },
+        responsive: true,
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+    myChart.update()
+    */
+    function setData(data){
+        console.log(data);
+        console.log(Object.keys(data));
+        console.log(Object.values(data));
+        var barChartData = {
+         labels : Object.keys(data), //["January","February","March","April","May","June","July"],
+            datasets : [
+                {
+                    fillColor : "rgba(220,220,220,0.5)",
+                    strokeColor : "rgba(220,220,220,0.8)",
+                    highlightFill: "rgba(220,220,220,0.75)",
+                    highlightStroke: "rgba(220,220,220,1)",
+                    data : Object.values(data)
+                }
+            ],
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        }
+        var ctx = document.getElementById("myChart").getContext("2d");
+        var myBar = new Chart(ctx).Bar(barChartData);
+    }
+    var $startURL = 'all';
+    var $emptyData = $('.Select').serialize();
+
+    $.ajax({
+        method: "POST",
+        url: $startURL,
+        data: $emptyData,
+        success: handleFormSuccess,
+        error: handleFormError,
+    }).done(function(data) {
+        setData(data)
+        console.log(window.location.href)
+    });
+    console.log(window.location.href)
+    $('.select2').select2()
+{% endblock %}

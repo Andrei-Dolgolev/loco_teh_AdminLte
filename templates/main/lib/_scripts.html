@@ -1,0 +1,15 @@
+{% load static %}
+
+{% block scripts %}
+<script src="{% static "jquery/dist/jquery.min.js" %}"></script>
+<script src="{% static "jquery/dist/jquery-ui.min.js" %}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button);
+</script>
+    <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %} "></script>
+    <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>
+    <!--<script src="{ tatic "js/bower_components/chart.js/Chart.js" %}"></script>-->
+    <script src="{% static "js/bower_components/chart.js/Chart.js" %}"></script>
+    <script src="{% static "js/bower_components/select2/dist/js/select2.full.min.js" %}"></script>
+{% endblock %}
